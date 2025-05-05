@@ -1,7 +1,7 @@
 package com.example.product_project_01.models;
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -18,8 +18,9 @@ public class Product {
     @SequenceGenerator(name = "product_sequence", sequenceName = "product_sequence", allocationSize = 1)
     private Integer id;
 
-    @ManyToOne      // will map to 'category_id' field by default in this case.
+    @ManyToOne      // will auto-map to 'category_id' field by default in this case.
 //    @JoinColumn(name="category_id")
+    @JsonBackReference
     private Category category;
 
     @Column(unique = true, nullable = false)      // 'name' must exist and be unique
@@ -29,6 +30,9 @@ public class Product {
     private Integer stockAmount;
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+//    @Transient
+//    public String categoryName = "";
 
     public Product() {} // a No-argument constructor. This is necessary for the 'Entity' functions.
 

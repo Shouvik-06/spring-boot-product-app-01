@@ -1,11 +1,12 @@
 package com.example.product_project_01.models;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
+import java.rmi.NoSuchObjectException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/products")
@@ -24,28 +25,71 @@ public class ProductController {
      */
 
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
     //included 'category' stuff here instead of creating a CategoryController class.
-//    private final CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ProductController(ProductRepository productRepository) {
+    public ProductController(ProductRepository productRepository, CategoryRepository categoryRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
-//        this.categoryRepository = categoryRepository;
+        this.categoryRepository = categoryRepository;
+        this.productMapper = productMapper;
+    }
+
+    @GetMapping("")
+    public List<ProductDto> findAll() {
+        return productRepository.findAll()
+                .stream()
+                .map(product -> productMapper.toDto(product))
+                .toList();
+    }
+
+//    @GetMapping("")
+//    public List<Product> findAll() {
+////        return productRepository.findAll();
+//        List<Product> products = productRepository.findAll();
+//        for (Product product: products) {
+//            product.categoryName = product.getCategory().getName();
+//        }
+//        return products;
+//    }
+
+    @GetMapping("/{id}")
+    public ProductDto findByID(@PathVariable Integer id) {
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isEmpty()) {
+            throw new ProductNotFoundException();
+        }
+        return productMapper.toDto(product.get());
     }
 
 
-    @GetMapping("")
-    public List<String> findAll() {
-//        return productRepository.findAll();
-        List<Product> products =  productRepository.findAll();
-        List<String> product_entries = new ArrayList<String>();
-        for (Product product : products) {
-            product_entries.add(String.format("ID:%s,Name:%s,Price:$%s,Category:%s",
-                    product.getId(),
-                    product.getName(),
-                    product.getPrice(),
-                    product.getCategory().getName()));
+    // TODO
+    // post
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("")
+    public void create(@RequestBody Integer tempID) {
+        if (tempID != null) {
+            System.out.println("Category ID exists");
+            System.out.println("Category ID: " + tempID);
         }
-        return product_entries;
+
+//        productRepository.save(product);
+    }
+
+
+//    CHECK without ID included in JSON, but instead in path variable
+    // put
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/{id}")
+    public void update(@RequestBody Product product, @PathVariable Integer id) {
+        productRepository.save(product);
+    }
+
+    // delete
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        productRepository.deleteById(id);
     }
 
 }
