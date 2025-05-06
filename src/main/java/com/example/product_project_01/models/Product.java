@@ -29,6 +29,7 @@ public class Product {
     private Integer price;
     private Integer stockAmount;
     @CreationTimestamp
+    @Column(updatable=false)    // this is to prevent setting createdAt to null on update (if value isn't provided)
     private LocalDateTime createdAt;
 
 //    @Transient
@@ -67,5 +68,13 @@ public class Product {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

@@ -3,8 +3,6 @@ package com.example.product_project_01.models;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.rmi.NoSuchObjectException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,12 +14,12 @@ public class ProductController {
     Routes:
     Common route: "/api/products"
     "" : index (list all products)
+    "?category={category}" : get products by category
     "/{id}": find (get by id)
     POST "": create
-    PUT "": update
-    DELETE "": destroy
+    PUT "/{id}": update
+    DELETE "/{id}": destroy
     "/category": index (of category), i.e. show all categories
-    "/product-by-category/{cateogory_id}": get all products in category
      */
 
     private final ProductRepository productRepository;
@@ -35,9 +33,16 @@ public class ProductController {
         this.productMapper = productMapper;
     }
 
+    // return all products, OR if categoryId provided, return products filtered by category
     @GetMapping("")
-    public List<ProductDto> findAll() {
-        return productRepository.findAll()
+    public List<ProductDto> findAll(@RequestParam(required = false) Integer categoryId) {
+        List<Product> products;
+        if (categoryId != null) {
+            products = productRepository.findAllByCategoryId(categoryId);
+        } else {
+            products = productRepository.findAll();
+        }
+        return products
                 .stream()
                 .map(product -> productMapper.toDto(product))
                 .toList();
@@ -62,34 +67,49 @@ public class ProductController {
         return productMapper.toDto(product.get());
     }
 
-
-    // TODO
     // post
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
-    public void create(@RequestBody Integer tempID) {
-        if (tempID != null) {
-            System.out.println("Category ID exists");
-            System.out.println("Category ID: " + tempID);
+    public ProductDto create(@RequestBody Product product) {
+        var category = categoryRepository.findById(product.getCategory().getId()).orElse(null);
+        if (category == null) {
+            throw new CategoryNotFoundException();
         }
-
-//        productRepository.save(product);
+        product.setCategory(category);
+        productRepository.save(product);
+        return productMapper.toDto(product);
     }
 
-
-//    CHECK without ID included in JSON, but instead in path variable
     // put
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{id}")
-    public void update(@RequestBody Product product, @PathVariable Integer id) {
+    public ProductDto update(@RequestBody Product product, @PathVariable Integer id) {
+        product.setId(id);
+
+        // check existence of product and category
+        var category = categoryRepository.findById(product.getCategory().getId()).orElse(null);
+        if (category == null) {
+            throw new CategoryNotFoundException();
+        }
+        var old_product = productRepository.findById(id).orElse(null);
+        if (old_product == null) {
+            throw new ProductNotFoundException();
+        }
+
+        product.setCategory(category);
         productRepository.save(product);
+        return productMapper.toDto(product);
     }
 
     // delete
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) {
-        productRepository.deleteById(id);
+        var product = productRepository.findById(id).orElse(null);
+        if (product == null) {
+            throw new ProductNotFoundException();
+        }
+        productRepository.delete(product);
     }
 
 }
