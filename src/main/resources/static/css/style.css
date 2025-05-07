@@ -1,0 +1,20 @@
+.main-table {
+    table-layout: fixed;
+    width: 800px;
+    border-collapse: collapse;
+    border: 2px solid purple;
+    text-align: center;
+}
+
+.main-table th {
+    border-bottom: 1px solid purple;
+    background-color: mintcream;
+}
+
+.main-table thead th:nth-child(1) {
+    width: 10%;
+  }
+
+.main-table tr {
+    border-bottom: 1px solid lightgray;
+}

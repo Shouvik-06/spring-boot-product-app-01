@@ -1,6 +1,7 @@
 package com.example.product_project_01.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -17,6 +18,12 @@ public class ProductDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
     private String categoryName;
+    @JsonIgnore
+    private Integer categoryId;
 
     public ProductDto() {}  // No-Args-Constructor
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
 }

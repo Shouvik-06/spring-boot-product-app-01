@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Products List</title>
-    <link rel="stylesheet" th:href="@{style.css}">
+    <link rel="stylesheet" th:href="@{css/style.css}">
 </head>
 <body>
     <h1>Products List:</h1>
+    <div>
+        <a href="/products/create"><button type="button">Add Product</button></a>
+    </div>
     <div>
         <table class="main-table">
             <thead>
@@ -18,13 +21,14 @@
                     <th>Stock Amount</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody th:each="product : ${products}">
                 <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
+                    <td th:text="${product.getId()}">A</td>
+                    <td th:text="${product.getName()}">B</td>
+                    <td><a th:text="${product.getCategoryName()}"
+                           th:href="'/products?categoryId=' + ${product.getCategoryId()}">C</a></td>
+                    <td th:text="${product.getPrice()}">D</td>
+                    <td th:text="${product.getStockAmount()}">E</td>
                 </tr>
             </tbody>
         </table>

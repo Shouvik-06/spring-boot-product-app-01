@@ -3,6 +3,7 @@ package com.example.product_project_01.models;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,21 +11,8 @@ import java.util.Optional;
 @RequestMapping("/api/products")
 public class ProductController {
 
-        /*
-    Routes:
-    Common route: "/api/products"
-    "" : index (list all products)
-    "?category={category}" : get products by category
-    "/{id}": find (get by id)
-    POST "": create
-    PUT "/{id}": update
-    DELETE "/{id}": destroy
-    "/category": index (of category), i.e. show all categories
-     */
-
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
-    //included 'category' stuff here instead of creating a CategoryController class.
     private final CategoryRepository categoryRepository;
 
     public ProductController(ProductRepository productRepository, CategoryRepository categoryRepository, ProductMapper productMapper) {
@@ -111,5 +99,4 @@ public class ProductController {
         }
         productRepository.delete(product);
     }
-
 }
